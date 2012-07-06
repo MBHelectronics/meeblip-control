@@ -175,20 +175,24 @@ class MainWindow(QtGui.QMainWindow):
             inputDeviceHash = str(inputDeviceHash.toString())
             for deviceWidget, index in self.midiInputDevicesDict.iteritems():
                 deviceName = midi.get_device_info(index)[1]
-                if hashlib.md5(deviceName).hexdigest() == inputDeviceHash:
+                deviceHash = hashlib.md5(deviceName).hexdigest()
+                if deviceHash == inputDeviceHash:
                     deviceWidget.setChecked(True)
                     self.windowHandler.midiInputSelect(self, deviceWidget)
-                    registryInputDeviceList.append(hashlib.md5(deviceName).hexdigest())            
+                    registryInputDeviceList.append(deviceHash)            
         self.settings.setValue('midiInputDevices', registryInputDeviceList) 
         #update the registry so unplugged devices aren't 
         #reselected when plugged back in at some later time
         outputDeviceHash = str(self.settings.value('midiOutputDevice').toString())
+        registryOutputDevice = None
         for deviceWidget, index in self.midiOutputDevicesDict.iteritems():
                 deviceName = midi.get_device_info(index)[1]
-                if hashlib.md5(deviceName).hexdigest() == outputDeviceHash:
+                deviceHash = hashlib.md5(deviceName).hexdigest()
+                if deviceHash == outputDeviceHash:
                     deviceWidget.setChecked(True)
                     self.windowHandler.midiOutputSelect(self, deviceWidget)
-                    self.settings.setValue('midiOutputDevice', hashlib.md5(deviceName).hexdigest())
+                    registryOutputDevice = deviceHash
+        self.settings.setValue('midiOutputDevice', registryOutputDevice)
             
     @QtCore.pyqtSignature("")
     def on_action_MIDI_Channel_triggered(self):
